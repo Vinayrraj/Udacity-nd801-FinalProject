@@ -7,4 +7,8 @@
 
     <!-- API -->
     <string name="api_fetch_joke" translatable="false">https://nss-androidcloud.appspot.com/joke</string>
+
+    <!-- API Errors -->
+    <string name="error_api_fetch_joke" translatable="false">Joke download failed.</string>
+    <string name="msg_loading_joke">Fetching Joke, please wait.</string>
 </resources>

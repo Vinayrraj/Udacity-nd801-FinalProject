@@ -1,23 +1,21 @@
 package com.udacity.gradle.builditbigger;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.udacity.gradle.builditbigger.display.JokeDisplayActivity;
-
-import java.io.IOException;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import com.udacity.gradle.builditbigger.remote.FetchJokeTask;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +47,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void tellJoke(View view) {
-        final FetchJokeTask task = new FetchJokeTask();
+        fetchJoke(mFetchJokeTaskListener);
+    }
+
+    void fetchJoke(FetchJokeTask.FetchJokeTaskListener onResult) {
+        dialog = new ProgressDialog(this);
+        dialog.setMessage(getString(R.string.msg_loading_joke));
+        //dialog.setCancelable(false);
+        dialog.show();
+        final FetchJokeTask task = new FetchJokeTask(onResult);
         task.execute();
     }
 
+
+    private final FetchJokeTask.FetchJokeTaskListener mFetchJokeTaskListener = new FetchJokeTask.FetchJokeTaskListener() {
+
+        @Override
+        public void onJokeFetched(String joke) {
+            dialog.dismiss();
+            showJoke(joke);
+        }
+
+        @Override
+        public String getApi() {
+            return getString(R.string.api_fetch_joke);
+        }
+
+        @Override
+        public void onError() {
+            dialog.dismiss();
+            Toast.makeText(MainActivity.this, getString(R.string.error_api_fetch_joke), Toast.LENGTH_SHORT).show();
+        }
+    };
 
     private void showJoke(String joke) {
         Intent intent = new Intent(this, JokeDisplayActivity.class);
@@ -61,41 +87,5 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
-    private class FetchJokeTask extends AsyncTask<String, Integer, String> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            String joke = null;
-            OkHttpClient client = new OkHttpClient();
-            Request request =
-                    new Request.Builder()
-                            .url(getString(R.string.api_fetch_joke))
-                            .build();
-            Response response = null;
-            try {
-                response = client.newCall(request).execute();
-                if (response.isSuccessful()) {
-                    return response.body().string();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return "Joke download failed.";
-        }
-
-
-        @Override
-        protected void onPostExecute(String joke) {
-            super.onPostExecute(joke);
-            showJoke(joke);
-        }
-    }
 
 }

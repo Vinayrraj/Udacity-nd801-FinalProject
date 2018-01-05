@@ -16,6 +16,7 @@ import com.udacity.gradle.builditbigger.remote.FetchJokeTask;
 public class MainActivity extends AppCompatActivity {
 
     private ProgressDialog dialog;
+    private boolean isTaskInProgress = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,12 +52,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void fetchJoke(FetchJokeTask.FetchJokeTaskListener onResult) {
-        dialog = new ProgressDialog(this);
-        dialog.setMessage(getString(R.string.msg_loading_joke));
-        //dialog.setCancelable(false);
-        dialog.show();
-        final FetchJokeTask task = new FetchJokeTask(onResult);
-        task.execute();
+        if (!isTaskInProgress) {
+            isTaskInProgress = true;
+            dialog = new ProgressDialog(this);
+            dialog.setMessage(getString(R.string.msg_loading_joke));
+            //dialog.setCancelable(false);
+            dialog.show();
+            final FetchJokeTask task = new FetchJokeTask(onResult);
+            task.execute();
+        }
     }
 
 
@@ -64,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onJokeFetched(String joke) {
+            isTaskInProgress = false;
             dialog.dismiss();
             showJoke(joke);
         }
@@ -75,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onError(String Error) {
+            isTaskInProgress = false;
             dialog.dismiss();
             Toast.makeText(MainActivity.this, getString(R.string.error_api_fetch_joke), Toast.LENGTH_SHORT).show();
         }

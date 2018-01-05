@@ -18,6 +18,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "color" // Without flavorDimension it was not working.
+    productFlavors{
+        free {
+            applicationIdSuffix = ".free"
+        }
+        paid {
+            applicationIdSuffix = ".paid"
+        }
+    }
 }
 
 dependencies {
@@ -27,7 +37,7 @@ dependencies {
     })
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:26.1.0'
-    compile 'com.google.android.gms:play-services-ads:9.8.0'
+    freeCompile 'com.google.android.gms:play-services-ads:9.8.0'
     implementation project(':lib')
     implementation project(':displayjoke')
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'

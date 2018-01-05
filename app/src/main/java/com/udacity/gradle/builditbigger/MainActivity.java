@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onError() {
+        public void onError(String Error) {
             dialog.dismiss();
             Toast.makeText(MainActivity.this, getString(R.string.error_api_fetch_joke), Toast.LENGTH_SHORT).show();
         }

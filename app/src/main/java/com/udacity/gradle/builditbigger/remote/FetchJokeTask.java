@@ -14,6 +14,7 @@ import okhttp3.Response;
 
 public class FetchJokeTask extends AsyncTask<String, Integer, String> {
 
+    private static final String _ERROR = "ERROR";
     private FetchJokeTaskListener mListener;
 
     public FetchJokeTask(FetchJokeTaskListener listener) {
@@ -25,7 +26,7 @@ public class FetchJokeTask extends AsyncTask<String, Integer, String> {
 
         String getApi();
 
-        void onError();
+        void onError(String error);
     }
 
 
@@ -50,15 +51,15 @@ public class FetchJokeTask extends AsyncTask<String, Integer, String> {
             e.printStackTrace();
         }
 
-        return null;
+        return _ERROR;
     }
 
 
     @Override
     protected void onPostExecute(String joke) {
         super.onPostExecute(joke);
-        if (joke == null) {
-            mListener.onError();
+        if (joke == null || joke.equals(_ERROR)) {
+            mListener.onError(_ERROR);
         } else {
             mListener.onJokeFetched(joke);
         }

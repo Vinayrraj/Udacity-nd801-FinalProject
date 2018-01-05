@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-public class JokeDisplayActivity extends AppCompatActivity {
+public class JokeDisplayActivity extends AppCompatActivity implements JokeDisplayFragment.JokeDisplayListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -14,4 +14,8 @@ public class JokeDisplayActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
+    @Override
+    public String getJoke() {
+        return getIntent().getStringExtra(getString(R.string.extra_joke_text));
+    }
 }

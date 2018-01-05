@@ -30,4 +30,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-ads:9.8.0'
     implementation project(':lib')
     implementation project(':displayjoke')
+    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
 }

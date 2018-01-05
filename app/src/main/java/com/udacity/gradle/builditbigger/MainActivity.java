@@ -1,6 +1,7 @@
 package com.udacity.gradle.builditbigger;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -8,7 +9,12 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.udacity.gradle.builditbigger.display.JokeDisplayActivity;
-import com.udacity.gradle.builditbigger.lib.Joke;
+
+import java.io.IOException;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -43,10 +49,53 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void tellJoke(View view) {
+        final FetchJokeTask task = new FetchJokeTask();
+        task.execute();
+    }
+
+
+    private void showJoke(String joke) {
         Intent intent = new Intent(this, JokeDisplayActivity.class);
-        intent.putExtra(getString(R.string.extra_joke_text), new Joke().getJoke());
+        //intent.putExtra(getString(R.string.extra_joke_text), new Joke().getJoke());
+        intent.putExtra(getString(R.string.extra_joke_text), joke);
         startActivity(intent);
     }
 
+
+    private class FetchJokeTask extends AsyncTask<String, Integer, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String joke = null;
+            OkHttpClient client = new OkHttpClient();
+            Request request =
+                    new Request.Builder()
+                            .url(getString(R.string.api_fetch_joke))
+                            .build();
+            Response response = null;
+            try {
+                response = client.newCall(request).execute();
+                if (response.isSuccessful()) {
+                    return response.body().string();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return "Joke download failed.";
+        }
+
+
+        @Override
+        protected void onPostExecute(String joke) {
+            super.onPostExecute(joke);
+            showJoke(joke);
+        }
+    }
 
 }

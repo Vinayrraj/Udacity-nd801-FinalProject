@@ -1,12 +1,12 @@
 package com.udacity.gradle.builditbigger;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.udacity.gradle.builditbigger.display.JokeDisplayActivity;
@@ -15,13 +15,22 @@ import com.udacity.gradle.builditbigger.remote.FetchJokeTask;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ProgressDialog dialog;
+    private ProgressBar mProgressBar;
     private boolean isTaskInProgress = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mProgressBar = findViewById(R.id.main_pd);
+        mProgressBar.setVisibility(View.GONE);
+        findViewById(R.id.main_btn_tell_a_joke).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fetchJoke(mFetchJokeTaskListener);
+            }
+        });
     }
 
 
@@ -47,17 +56,10 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void tellJoke(View view) {
-        fetchJoke(mFetchJokeTaskListener);
-    }
 
     void fetchJoke(FetchJokeTask.FetchJokeTaskListener onResult) {
         if (!isTaskInProgress) {
             isTaskInProgress = true;
-            dialog = new ProgressDialog(this);
-            dialog.setMessage(getString(R.string.msg_loading_joke));
-            //dialog.setCancelable(false);
-            dialog.show();
             final FetchJokeTask task = new FetchJokeTask(onResult);
             task.execute();
         }
@@ -67,9 +69,14 @@ public class MainActivity extends AppCompatActivity {
     private final FetchJokeTask.FetchJokeTaskListener mFetchJokeTaskListener = new FetchJokeTask.FetchJokeTaskListener() {
 
         @Override
+        public void onPreFetched() {
+            toggleProgressBar(true);
+        }
+
+        @Override
         public void onJokeFetched(String joke) {
             isTaskInProgress = false;
-            dialog.dismiss();
+            toggleProgressBar(false);
             showJoke(joke);
         }
 
@@ -81,10 +88,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onError(String Error) {
             isTaskInProgress = false;
-            dialog.dismiss();
+            toggleProgressBar(false);
             Toast.makeText(MainActivity.this, getString(R.string.error_api_fetch_joke), Toast.LENGTH_SHORT).show();
         }
     };
+
+    private void toggleProgressBar(boolean state) {
+        mProgressBar.setVisibility(state ? View.VISIBLE : View.GONE);
+    }
 
     private void showJoke(String joke) {
         Intent intent = new Intent(this, JokeDisplayActivity.class);

@@ -6,8 +6,7 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
-import com.udacity.gradle.builditbigger.backend.jokeApi.JokeApi;
-
+import com.udacity.gradle.builditbigger.backend.myApi.MyApi;
 
 import java.io.IOException;
 
@@ -19,13 +18,16 @@ public class FetchJokeTask extends AsyncTask<String, Integer, String> {
 
     private static final String _ERROR = "ERROR";
     private FetchJokeTaskListener mListener;
-    private static JokeApi apiService = null;
+    private static MyApi apiService = null;
 
     public FetchJokeTask(FetchJokeTaskListener listener) {
         mListener = listener;
     }
 
     public interface FetchJokeTaskListener {
+
+        void onPreFetched();
+
         void onJokeFetched(String joke);
 
         String getApi();
@@ -37,6 +39,7 @@ public class FetchJokeTask extends AsyncTask<String, Integer, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        mListener.onPreFetched();
     }
 
     @Override
@@ -49,15 +52,34 @@ public class FetchJokeTask extends AsyncTask<String, Integer, String> {
 
     private String getJokeFromLocal() {
         try {
-            return getService().joke().execute().getData();
+            return getService().getJoke().execute().getData();
         } catch (IOException e) {
             return e.getMessage();
         }
+
+
+//        OkHttpClient client = new OkHttpClient();
+//        Request request =
+//                new Request.Builder()
+//                        .url(mListener.getApi())
+//                        .build();
+//        try {
+//            Response response = client.newCall(request).execute();
+//            if (response.isSuccessful()) {
+//                return response.body().string();
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return _ERROR;
     }
 
-    private JokeApi getService() {
+    private MyApi getService() {
+
+
         if (apiService == null) {  // Only do this once
-            JokeApi.Builder builder = new JokeApi.Builder(AndroidHttp.newCompatibleTransport(),
+            MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
                     // options for running against local devappserver
                     // - 10.0.2.2 is localhost's IP address in Android emulator

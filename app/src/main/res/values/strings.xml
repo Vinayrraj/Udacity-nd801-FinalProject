@@ -6,7 +6,7 @@
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
 
     <!-- API -->
-    <string name="api_fetch_joke" translatable="false">https://nss-androidcloud.appspot.com/joke</string>
+    <string name="api_fetch_joke" translatable="false">http://10.0.2.2:8080/_ah/api/</string>
 
     <!-- API Errors -->
     <string name="error_api_fetch_joke" translatable="false">Joke download failed.</string>
